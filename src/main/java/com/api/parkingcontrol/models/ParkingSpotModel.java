@@ -17,6 +17,12 @@ import lombok.Data;
 @Data
 @Table(name = "TB_PARKING_SPOT")
 public class ParkingSpotModel implements Serializable {
+    /**
+     * Classes that do not implement this interface will not have any of their state serialized or
+     * deserialized. All subtypes of a serializable class are themselves serializable. The
+     * serialization interface has no methods or fields and serves only to identify the semantics of
+     * being serializable.
+     */
     private static final long serialVersionID = 1L;
 
     @Id
@@ -40,4 +46,8 @@ public class ParkingSpotModel implements Serializable {
     private String apartment;
     @Column(nullable = false, length = 30)
     private String block;
+
+    public static long getSerialversionid() {
+        return serialVersionID;
+    }
 }

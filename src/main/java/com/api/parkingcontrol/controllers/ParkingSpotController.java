@@ -2,7 +2,6 @@ package com.api.parkingcontrol.controllers;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,25 +39,33 @@ public class ParkingSpotController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
-        if(parkingSpotService.existsByLicensePlateCar(parkingSpotDTO.getLicensePlateCar())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: license plate car is already in use");
+    public ResponseEntity<Object> saveParkingSpot(
+            @RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
+        if (parkingSpotService.existsByLicensePlateCar(parkingSpotDTO.getLicensePlateCar())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Conflict: license plate car is already in use");
         }
-        if(parkingSpotService.existsByParkingSpotNumber(parkingSpotDTO.getParkingSpotNumber())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: parking spot number is already in use");
+        if (parkingSpotService.existsByParkingSpotNumber(parkingSpotDTO.getParkingSpotNumber())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Conflict: parking spot number is already in use");
         }
-        if(parkingSpotService.existsByApartmentAndBlock(parkingSpotDTO.getApartment(), parkingSpotDTO.getBlock())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: parking spot already registered for this apartment/block");
+        if (parkingSpotService.existsByApartmentAndBlock(parkingSpotDTO.getApartment(),
+                parkingSpotDTO.getBlock())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Conflict: parking spot already registered for this apartment/block");
         }
         var parkingSpotModel = new ParkingSpotModel();
         BeanUtils.copyProperties(parkingSpotDTO, parkingSpotModel);
         parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
-        return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpotModel));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(parkingSpotService.save(parkingSpotModel));
     }
 
     @GetMapping
-    public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpots(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.getAllParkingSpots(pageable));
+    public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpots(@PageableDefault(page = 0,
+            size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(parkingSpotService.getAllParkingSpots(pageable));
     }
 
     @GetMapping("/{id}")
@@ -77,11 +84,13 @@ public class ParkingSpotController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("parking spot not found");
         }
         parkingSpotService.deleteParkingSpot(parkingSpotModelOptional.get().getId());
-        return ResponseEntity.status(HttpStatus.OK).body("parking spot deleted succesfully \n" + parkingSpotModelOptional.get());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("parking spot deleted succesfully \n" + parkingSpotModelOptional.get());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id, @RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
+    public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
+            @RequestBody @Valid ParkingSpotDTO parkingSpotDTO) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
         if (!parkingSpotModelOptional.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("parking spot not found");
